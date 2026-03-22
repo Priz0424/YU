@@ -1,0 +1,3399 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#fdfaf6">
+  <title>YU的京阪行</title>
+  <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d4a373;
+            --kr: #1a5e9a;
+            --uae: #8b6b4d;
+            --euro: #27ae60;
+            --glass: rgba(255, 255, 255, 0.92);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; } /* 基礎平滑滾動 */
+
+        body { 
+            font-family: 'Inter', -apple-system, 'PingFang TC', sans-serif; 
+            background: #fdfaf6; 
+            margin: 0; 
+            color: #333; 
+            overflow-x: hidden;
+            transition: background-color 0.26s ease;
+        }
+
+        /* 英雄區增加 padding 防止遮擋第一段內容 */
+        .hero {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 25px 25px 30px;
+            text-align: left;
+            max-height: 15vh;
+        }
+        .hero-right {
+            position: absolute;
+            top: 70%;
+            right: 18px;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 5;
+        }
+
+        .hero-btn {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(26, 26, 26, 0.72);
+            color: #fff;
+            backdrop-filter: blur(12px);
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            white-space: nowrap;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.22);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-2px);
+            background: rgba(26, 26, 26, 0.86);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.28);
+        }
+
+        .hero-btn--active {
+            background: var(--accent);
+            color: #000;
+            border-color: rgba(0,0,0,0.15);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.24);
+        }
+        .hero-btn--active:hover,
+        .hero-btn--active:focus-visible {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 12px 22px rgba(0,0,0,0.26);
+        }
+
+        .hero-btn--cost {
+            background: rgba(26, 26, 26, 0.72);
+            border-color: rgba(255,255,255,0.25);
+        }
+        /* Cost page wrapper */
+        .cost-panel {
+            background: rgba(255,255,255,0.78);
+            border: 1px solid rgba(226,230,234,0.9);
+            border-radius: 18px;
+            padding: 18px 18px 14px;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.08);
+            backdrop-filter: blur(10px);
+        }
+
+        .cost-panel h2 {
+            margin-top: 0;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .cost-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .cost-toolbar .hint {
+            font-size: 0.85rem;
+            color: #555;
+            opacity: 0.9;
+        }
+
+        .cost-toolbar .mini-btn {
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid #e2e6ea;
+            background: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+        .cost-toolbar .mini-btn:hover {
+            transform: translateY(-1px);
+            background: #f6f8fb;
+        }
+
+        /* Excel 風格表格欄位寬度 */
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: #fff;
+            border: 1px solid #e2e6ea;
+            overflow: hidden;
+            border-radius: 12px;
+            table-layout: fixed; /* 固定欄位寬度 */
+        }
+
+        .cost-table thead th {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(180deg, #f7f9fb 0%, #eef2f6 100%);
+            z-index: 2;
+        }
+
+        .cost-table th,
+        .cost-table td {
+            border: 1px solid #e2e6ea;
+            padding: 12px 14px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .cost-table tbody tr:hover {
+            background: #fff7e6;
+        }
+
+        .cost-summary {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .cost-summary .pill {
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #f4f6f8 0%, #eef2f6 100%);
+            border: 1px solid #e2e6ea;
+            font-weight: 900;
+            letter-spacing: 0.2px;
+        }
+
+        /* Tab content containers */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cost table styles (Excel-like) */
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: #fff;
+            border: 1px solid #e2e6ea;
+        }
+
+        .cost-table th,
+        .cost-table td {
+            border: 1px solid #e2e6ea;
+            padding: 10px 12px;
+            text-align: left;
+            vertical-align: top;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cost-table th:nth-child(1),
+        .cost-table td:nth-child(1),
+        .cost-table th:nth-child(5),
+        .cost-table td:nth-child(5) {
+            width: auto; /* 左右兩欄自動撐滿 */
+        }
+
+        .cost-table th:nth-child(2),
+        .cost-table td:nth-child(2),
+        .cost-table th:nth-child(3),
+        .cost-table td:nth-child(3),
+        .cost-table th:nth-child(4),
+        .cost-table td:nth-child(4) {
+            width: 80px; /* 中間三欄固定寬度 */
+            text-align: right;
+        }
+
+        .cost-table th {
+            background: #f4f6f8;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .cost-table tbody tr:nth-child(even) {
+            background: #fbfbfb;
+        }
+
+        .cost-table .right {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cost-summary {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .cost-summary .pill {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: #f4f6f8;
+            border: 1px solid #e2e6ea;
+            font-weight: 800;
+        }
+
+        .cost-summary .pill strong {
+            margin-right: 6px;
+        }
+        .hero h1 { font-size: 2rem; margin: 0; font-weight: 800; }
+        .hero p { opacity: 0.8; font-size: 0.8rem; letter-spacing: 2px; margin-top: 8px; }
+
+        .user-dots { display: flex; gap: 8px; margin-top: 15px; }
+        .dot { padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); }
+
+        /* 內容區：增加頂部 margin 讓第一天不會被擋住 */
+        .main-content { 
+            max-width: 1100px; 
+            margin: 30px auto 0; 
+            padding: 0 24px 150px; 
+        }
+
+        /* 重要：scroll-margin-top 防止跳轉後標題被頂部遮擋 */
+        .day-section { margin-bottom: 60px; scroll-margin-top: 40px; }
+        .day-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+        .day-num { font-size: 2.8rem; font-weight: 900; color: var(--accent); opacity: 0.25; line-height: 1; }
+        .day-info { font-size: 1.15rem; font-weight: bold; color: var(--primary); }
+
+        /* 日期亮燈 / 暗燈效果（目前觀看日） */
+        .day-header {
+            position: relative;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0.45;
+        }
+
+        .day-header.in-view {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        /* 日期亮燈的柔光底 */
+        .day-header.in-view::after {
+            content: "";
+            position: absolute;
+            left: -8px;
+            right: -8px;
+            bottom: -6px;
+            height: 18px;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(255, 214, 102, 0.45) 0%,
+                rgba(255, 214, 102, 0.25) 35%,
+                rgba(255, 214, 102, 0.0) 70%
+            );
+            pointer-events: none;
+        }
+
+        .event-wrapper {
+            margin-left: 0;
+            padding-left: 0;
+            border-left: none;
+        }
+        /* Event Card（簡潔對齊版） */
+        .event-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            border: 1px solid #eceff3;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* 目前觀看中的卡片凸顯效果 */
+        .event-card {
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+
+        .event-card.in-view {
+            transform: scale(1.03);
+            box-shadow: 0 14px 32px rgba(0,0,0,0.12);
+            z-index: 2;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .event-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+            }
+        }
+
+        /* 移除時間軸圓點 */
+        .event-card::before {
+            content: none;
+        }
+
+        /* 航班卡片標頭（班號融合） */
+        .flight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .flight-airline {
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        .flight-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.05);
+            color: #444;
+        }
+
+        /* 航司對應低調色（只影響 flight-number） */
+        .flight-etihad .flight-number { background: rgba(139,107,77,0.15); }
+        .flight-scoot .flight-number { background: rgba(176,138,60,0.15); }
+        .flight-tiger .flight-number { background: rgba(162,74,74,0.15); }
+
+        /* 航班與交通細節 */
+        .flight-detail { background: #1e272e; color: #fff; border-radius: 16px; padding: 12px 12px; margin: 8px 0; border-left: 5px solid var(--accent); }
+
+        /* =========================
+           航司視覺區別（航班卡片）
+           ========================= */
+
+        .event-card.flight-etihad {
+            border-left: 5px solid #8b6b4d;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f1ec 100%);
+        }
+
+        .event-card.flight-scoot {
+            border-left: 5px solid #b08a3c;
+            background: linear-gradient(180deg, #ffffff 0%, #f3efe6 100%);
+        }
+
+        .event-card.flight-tiger {
+            border-left: 5px solid #a24a4a;
+            background: linear-gradient(180deg, #ffffff 0%, #f4eded 100%);
+        }
+
+        /* 航班內層時間資訊加強 */
+        .event-card.flight-etihad .flight-detail,
+        .event-card.flight-scoot .flight-detail,
+        .event-card.flight-tiger .flight-detail {
+            border-radius: 14px;
+            background: #1e272e;
+        }
+
+        .event-card.flight-etihad .badge {
+            background: #8b6b4d;
+            color: #fff;
+        }
+
+        .event-card.flight-scoot .badge {
+            background: #b08a3c;
+            color: #fff;
+        }
+
+        .event-card.flight-tiger .badge {
+            background: #a24a4a;
+            color: #fff;
+        }
+        .flight-route {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+            align-items: center;
+            column-gap: 8px;
+        }
+        .flight-route > div:not(.flight-middle) {
+            display: grid;
+            grid-template-rows: auto auto 0.78rem auto;
+            align-content: start;
+        }
+        .flight-route > div:not(.flight-middle) .airport-code { grid-row: 1; }
+        .flight-route > div:not(.flight-middle) .airport-time { grid-row: 2; }
+        .flight-route > div:not(.flight-middle) .airport-next-day {
+            grid-row: 3;
+            margin-top: 0;
+        }
+        .flight-route > div:not(.flight-middle) .flight-subinfo { grid-row: 4; }
+        .airport-code { font-size: 1.2rem; font-weight: 800; display: block; letter-spacing: 1px; color: #fff; }
+        .airport-time {
+            font-size: 1.1rem;
+            color: #ffb347;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            display: block;
+            margin-top: 2px;
+        }
+        .airport-next-day {
+            display: block;
+            margin-top: 2px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            color: #bbb;
+            line-height: 1;
+        }
+        .flight-info { font-size: 0.85rem; color: #ddd; margin-top: 6px; line-height: 1.3; }
+        .flight-subinfo { font-size: 0.75rem; color: #bbb; margin-top: 2px; }
+        .flight-middle {
+            display: grid;
+            grid-template-rows: 1.25rem 0.9rem;
+            align-items: center;
+            justify-items: center;
+            row-gap: 4px;
+            min-width: 72px;
+            width: 72px;
+            flex: 0 0 72px;
+            text-align: center;
+            line-height: 1;
+        }
+        .flight-middle-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            font-size: 1.08rem;
+            line-height: 1;
+            opacity: 1;
+        }
+        .flight-middle-duration {
+            margin-top: 0;
+            min-height: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            color: #ddd;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Day 03: 雙航班選項卡片壓縮高度 */
+        .event-card.flight-options-compact {
+            background: transparent;
+            border: 0;
+            border-left: 0;
+            box-shadow: none;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+
+        .event-card.flight-options-compact:not(.flight-etihad):not(.flight-scoot):not(.flight-tiger) {
+            background: transparent;
+            border: 0;
+            border-left: 0;
+            box-shadow: none;
+        }
+
+        .event-card.flight-options-compact.in-view,
+        .event-card.flight-options-compact:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .flight-options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .flight-option {
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        .flight-option + .flight-option {
+            margin-top: 2px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(0,0,0,0.12);
+        }
+
+        .flight-options-compact .flight-header {
+            display: none;
+        }
+
+        .flight-options-compact .flight-detail {
+            margin: 0 auto;
+            padding: 6px 12px;
+            border-radius: 12px;
+            width: calc(100% - 12%);
+            aspect-ratio: 4 / 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .flight-options-compact .airport-code {
+            font-size: 1.14rem;
+        }
+
+        .flight-options-compact .airport-time {
+            font-size: 1.04rem;
+            letter-spacing: 1.2px;
+        }
+
+        .flight-options-compact .flight-subinfo {
+            font-size: 0.74rem;
+        }
+
+        .flight-options-compact .flight-info {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 0.84rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .transport-detail {
+            margin: 0 auto;
+            padding: 6px 12px;
+            border-radius: 12px;
+            width: calc(100% - 12%);
+            aspect-ratio: 4 / 1.2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #1e272e;
+            color: #fff;
+            border-left: 5px solid #27ae60;
+        }
+
+        .flight-options-compact .transport-detail {
+            margin-top: 8px;
+        }
+
+        .flight-options-compact > .transport-detail:first-child {
+            margin-top: 0;
+        }
+
+        .transport-detail .flight-info {
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 0.84rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            color: #ddd;
+        }
+
+        .transport-detail .airport-time {
+            color: #7fd39f;
+        }
+
+        .transport-detail .flight-middle-icon {
+            opacity: 1;
+            color: #7fd39f;
+        }
+
+        .transport-detail .flight-subinfo {
+            color: #b9c3cd;
+        }
+
+        .transport-card-links {
+            width: calc(100% - 12%);
+            margin: 6px auto 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .transport-card-links .map-btn {
+            margin-top: 0;
+        }
+
+        /* 航空卡片：首次進入後自動收合，點擊展開 */
+        .event-card.flight-card {
+            position: relative;
+        }
+
+        .event-card.flight-card .flight-collapse-hint {
+            display: none;
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #2c3e50;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            text-align: left;
+            padding: 0;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .event-card.flight-card.is-collapsed {
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+        }
+
+        .event-card.flight-card.is-collapsed > * {
+            display: none !important;
+        }
+
+        .event-card.flight-card.is-collapsed > .flight-collapse-hint {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .event-card.flight-card.is-collapsed > .flight-collapse-hint::after {
+            content: "▼";
+            font-size: 0.72rem;
+            color: #666;
+        }
+
+        .land-detail {
+            background: #f4f6f8;
+            color: #2c3e50;
+            border-radius: 16px;
+            padding: 18px;
+            margin: 12px 0;
+            border-left: 5px solid #27ae60;
+        }
+
+        .land-route {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .land-icon {
+            font-size: 1.4rem;
+            opacity: 0.6;
+        }
+
+        .land-info {
+            font-size: 0.85rem;
+            margin-top: 6px;
+            color: #555;
+        }
+
+        /* 巴士/火車卡片壓縮高度 */
+        .land-detail.transport-compact {
+            padding: 12px 14px;
+            margin: 8px 0;
+            border-radius: 12px;
+        }
+
+        .land-detail.transport-compact .land-icon {
+            font-size: 1.2rem;
+        }
+
+        .land-detail.transport-compact .land-info {
+            margin-top: 4px;
+            font-size: 0.82rem;
+        }
+
+        .land-detail.transport-compact .map-btn {
+            margin-top: 8px;
+            padding: 5px 10px;
+        }
+
+        .badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 8px; font-weight: 800; color: white; display: inline-block; margin-bottom: 10px; text-transform: uppercase; }
+        .bg-kr { background: var(--kr); }
+        .bg-uae { background: var(--uae); }
+        .bg-euro { background: var(--euro); }
+
+        .map-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 20px;
+            background: #eef2f7;
+            color: #2c3e50;
+            text-decoration: none;
+            border: 1px solid #dde3ea;
+        }
+        .map-btn:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .event-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .transport-badge { background: #f8f9fa; padding: 15px; border-radius: 16px; margin-top: 10px; border: 1px solid #edf2f7; }
+        .node { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.85rem; }
+        .node-time { font-weight: 700; color: var(--primary); min-width: 55px; }
+
+        /* 行程文字排版（清單型） */
+        .trip-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .trip-list li {
+            margin-bottom: 8px;
+            padding-left: 6px;
+        }
+
+        .trip-list .time {
+            font-weight: 800;
+            color: var(--accent);
+            margin-right: 6px;
+        }
+
+        .spot-link {
+            color: inherit;
+            text-decoration: underline;
+            text-decoration-color: rgba(44, 62, 80, 0.35);
+            text-underline-offset: 2px;
+            text-decoration-thickness: 1px;
+        }
+
+        .spot-link:hover {
+            color: var(--primary);
+            text-decoration-color: var(--accent);
+        }
+
+        .trip-list .note {
+            font-size: 0.75rem;
+            color: #777;
+            margin-left: 0;
+            /* 6px 為 li 的 padding-left，42px 為 .time 近似寬度 */
+            padding-left: calc(6px + 42px);
+            margin-top: 2px;
+        }
+
+        .trip-list .todo {
+            font-weight: 700;
+            background: #f6f7fa;
+            padding: 6px 10px;
+            border-radius: 10px;
+        }
+
+        /* ===== 單張圖片方形容器（行程照片共用） ===== */
+        .square-photo {
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1 / 1;
+            margin: 0 auto;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #f4f6f8;
+        }
+
+        .square-photo:hover {
+            transform: scale(1.02);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+        }
+
+        .square-photo img,
+        .square-photo video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* ===== 可左右滑動圖片輪播（Day 09） ===== */
+        .photo-carousel {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-carousel.photo-carousel-full {
+            max-width: none;
+            width: 100%;
+            margin: 0;
+        }
+
+        .photo-carousel.photo-carousel-full .square-photo {
+            max-width: none;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            height: auto;
+            overflow: hidden;
+        }
+
+        .photo-carousel.photo-carousel-full .square-photo img,
+        .photo-carousel.photo-carousel-full .square-photo video {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-carousel.photo-carousel-full .photo-carousel-track {
+            align-items: stretch;
+            transition: height 0.28s ease;
+        }
+
+        .photo-carousel.photo-carousel-full .photo-carousel-slide {
+            align-self: stretch;
+            aspect-ratio: 1 / 1;
+        }
+
+        .event-card.event-card-photo-bg {
+            background: #fdfaf6;
+            padding-left: 0;
+            padding-right: 0;
+            padding-bottom: 0;
+            border: 0;
+            box-shadow: none;
+            --photo-card-radius: 16px;
+            border-radius: var(--photo-card-radius);
+            overflow: hidden;
+        }
+
+        .event-card.event-card-photo-bg .event-title {
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+        .event-card.event-card-photo-bg .square-photo {
+            border-radius: var(--photo-card-radius);
+            box-shadow: none;
+        }
+
+        .event-card.event-card-photo-bg .photo-carousel {
+            border-radius: var(--photo-card-radius);
+            overflow: hidden;
+            isolation: isolate;
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+        }
+
+        .event-card.event-card-photo-bg .photo-carousel-track {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .event-card.event-card-photo-bg .photo-carousel-slide {
+            min-width: 100%;
+            max-width: 100%;
+        }
+
+        .event-card.event-card-photo-bg .photo-carousel-slide img,
+        .event-card.event-card-photo-bg .photo-carousel-slide video {
+            width: 100%;
+            border-radius: 0;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-carousel .square-photo {
+            cursor: grab;
+        }
+
+        .photo-carousel .square-photo:active {
+            cursor: grabbing;
+        }
+
+        .photo-carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .photo-carousel-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .photo-carousel-slide {
+            flex: 0 0 100%;
+            scroll-snap-align: center;
+            scroll-snap-stop: always;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-carousel-slide::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.28s ease;
+            background:
+                radial-gradient(120% 120% at 50% 50%, rgba(0, 0, 0, 0) 52%, rgba(0, 0, 0, 0.28) 100%),
+                linear-gradient(to top, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0) 45%);
+        }
+
+        .photo-carousel-slide.video-focus-active::after {
+            opacity: 0.2;
+        }
+
+        .photo-carousel-slide video {
+            transition: filter 0.28s ease;
+            filter: brightness(1);
+        }
+
+        .photo-carousel-slide video.video-focus-playing {
+            filter: brightness(1.3) saturate(1.1) contrast(1.06);
+        }
+
+        .photo-carousel-dots {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            z-index: 2;
+        }
+
+        .photo-carousel-counter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.42);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            backdrop-filter: blur(4px);
+        }
+
+        .photo-carousel-hint {
+            margin-top: 6px;
+            text-align: center;
+            font-size: 0.72rem;
+            color: #777;
+            letter-spacing: 0.2px;
+        }
+
+        /* ===== 圖片放大 Lightbox ===== */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 2000;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .lightbox-stage {
+            max-width: 92vw;
+            max-height: 92vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: pan-y;
+        }
+
+        .lightbox-stage img {
+            max-width: 92vw;
+            max-height: 92vh;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .lightbox-indicator {
+            position: absolute;
+            right: 14px;
+            bottom: 14px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.42);
+            color: #fff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.3px;
+        }
+        /* 底部導航按鈕（縮放動畫版本） */
+        .bottom-nav { 
+            position: fixed; 
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 2px); 
+            left: 50%; 
+            right: auto;
+            transform: translate3d(-50%, 0, 0); 
+            transform-origin: center bottom;
+            background: rgba(26, 26, 26, 0.9); 
+            backdrop-filter: blur(15px);
+            padding: 10px; 
+            border-radius: 50px; 
+            display: flex; 
+            gap: 5px; 
+            box-shadow: none; 
+            z-index: 1000; 
+            width: 90%; 
+            max-width: 500px; 
+            justify-content: space-around;
+            will-change: transform, opacity;
+            transition:
+                transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.3s ease,
+                padding 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                border-radius 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+                background 0.35s ease;
+        }
+        .bottom-nav a { 
+            color: white; 
+            text-decoration: none; 
+            font-size: 0.7rem; 
+            opacity: 0.4; 
+            font-weight: bold; 
+            padding: 10px 15px;
+            border-radius: 25px;
+            transition:
+                transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+                opacity 0.5s ease,
+                background 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                margin 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bottom-nav a.active { 
+            opacity: 1; 
+            background: var(--accent); 
+            color: #000; 
+            transform: scale(1.1);
+            transition:
+                transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+                opacity 0.5s ease,
+                background 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                font-size 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                min-width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                margin 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* iOS 26 Safari 風格：縮小為底部中間膠囊 */
+        .bottom-nav.scrolled {
+            left: 50%;
+            right: auto;
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
+            width: auto;
+            max-width: 90vw;
+            padding: 0;
+            border-radius: 999px;
+            background: rgba(28, 28, 30, 0.92);
+            box-shadow: none;
+            justify-content: center;
+            transform: translate3d(-50%, 0, 0);
+
+            transition:
+                transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.4s ease,
+                background 0.4s ease;
+        }
+        .bottom-nav.scrolled a {
+            opacity: 0;
+            pointer-events: none;
+            width: 0;
+            padding: 0;
+            margin: 0;
+            font-size: inherit;
+            background: none;
+            display: none;
+            /* scale to 0 for hiding */
+            transform: scale(0.6);
+            transition:
+                transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+                opacity 0.5s ease,
+                background 0.5s cubic-bezier(0.4,0,0.2,1),
+                color 0.5s cubic-bezier(0.4,0,0.2,1),
+                border-radius 0.5s cubic-bezier(0.4,0,0.2,1),
+                padding 0.5s cubic-bezier(0.4,0,0.2,1),
+                font-size 0.5s cubic-bezier(0.4,0,0.2,1),
+                width 0.5s cubic-bezier(0.4,0,0.2,1),
+                min-width 0.5s cubic-bezier(0.4,0,0.2,1),
+                height 0.5s cubic-bezier(0.4,0,0.2,1),
+                opacity 0.5s cubic-bezier(0.4,0,0.2,1),
+                margin 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+        .bottom-nav.scrolled a.active {
+            opacity: 1;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 更圓潤的膠囊形狀 */
+            padding: 0 20px;
+            margin: 0;
+            width: auto;
+            min-width: 40px;
+            height: 40px;
+            font-size: 0.9rem;
+            background: var(--accent);
+            color: #000;
+            border-radius: 999px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            overflow: visible;
+            white-space: nowrap;
+            /* scale up for active */
+            transform: scale(1.1);
+            transition:
+                transform 0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+                opacity 0.5s ease,
+                background 0.5s cubic-bezier(0.4,0,0.2,1),
+                color 0.5s cubic-bezier(0.4,0,0.2,1),
+                border-radius 0.5s cubic-bezier(0.4,0,0.2,1),
+                padding 0.5s cubic-bezier(0.4,0,0.2,1),
+                font-size 0.5s cubic-bezier(0.4,0,0.2,1),
+                width 0.5s cubic-bezier(0.4,0,0.2,1),
+                min-width 0.5s cubic-bezier(0.4,0,0.2,1),
+                height 0.5s cubic-bezier(0.4,0,0.2,1),
+                opacity 0.5s cubic-bezier(0.4,0,0.2,1),
+                margin 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+        /* 當花費分頁顯示時，強制隱藏底部導航 */
+        #tabContentCost.active ~ .bottom-nav {
+            display: none !important;
+        }
+
+        /* ===== Desktop 版面優化 ===== */
+        @media (min-width: 1200px) {
+            .main-content {
+                max-width: 1300px;
+                padding: 0 40px 150px;
+            }
+
+            .event-card {
+                padding: 22px 28px;
+            }
+
+            .day-num {
+                font-size: 3.5rem;
+            }
+        }
+    
+
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] [data-preview-edit] {
+        cursor: pointer;
+        text-decoration: underline dotted rgba(212, 163, 115, 0.45);
+        text-underline-offset: 2px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] [data-preview-edit]:hover {
+        text-decoration-color: rgba(212, 163, 115, 0.85);
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] input[data-preview-edit] {
+        cursor: pointer;
+      }
+      .trip-list .time.is-time-hidden {
+        visibility: hidden;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] .trip-list .time.is-time-hidden {
+        visibility: visible;
+        opacity: 0.42;
+      }
+      .trip-list {
+        --trip-time-width: 58px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 6px;
+      }
+      .trip-list li {
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: var(--trip-time-width) minmax(0, 1fr);
+        column-gap: 8px;
+        align-items: start;
+      }
+      .trip-list li.trip-transport {
+        display: block;
+      }
+      .trip-list li > .time {
+        grid-column: 1;
+        width: var(--trip-time-width);
+        min-width: 0;
+        margin-right: 0;
+        font-variant-numeric: tabular-nums;
+      }
+      .trip-list li > .note {
+        grid-column: 2;
+        padding-left: 0;
+      }
+      .trip-list li > :not(.time):not(.note):not(.preview-trip-drag):not(.preview-inline-remove) {
+        grid-column: 2;
+        min-width: 0;
+      }
+      .trip-list li.todo .todo-check {
+        display: grid;
+        grid-template-columns: var(--trip-time-width) minmax(0, 1fr);
+        column-gap: 8px;
+        align-items: start;
+        min-width: 0;
+      }
+      .trip-list li.todo .todo-check input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        justify-self: start;
+        align-self: start;
+        transform: translateY(1px);
+      }
+      .trip-list li.todo .todo-check span {
+        display: block;
+        min-width: 0;
+        line-height: 1.45;
+      }
+      .preview-inline-remove {
+        display: none;
+      }
+      .preview-quick-actions {
+        display: none;
+      }
+      .preview-card-shell {
+        position: relative;
+      }
+      .preview-drag-handle {
+        display: none;
+      }
+      .preview-card-tools {
+        display: none;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] .preview-quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-tools {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        z-index: 3;
+        display: inline-flex;
+        gap: 4px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-drag-handle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.94);
+        color: #334155;
+        font-size: 0.72rem;
+        font-weight: 900;
+        min-width: 26px;
+        height: 26px;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-drag-handle:active {
+        cursor: grabbing;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-tools button {
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #334155;
+        font-size: 0.68rem;
+        font-weight: 900;
+        width: 26px;
+        height: 26px;
+        cursor: pointer;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-tools button:hover {
+        background: #f8fafc;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-inline-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        border: 1px solid rgba(148, 163, 184, 0.65);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #475569;
+        font-size: 0.72rem;
+        font-weight: 900;
+        line-height: 1;
+        cursor: pointer;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-inline-remove:hover {
+        background: #f8fafc;
+      }
+      .preview-media-remove,
+      .preview-link-remove {
+        display: none;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-media-remove {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        right: auto;
+        z-index: 4;
+        display: inline-flex;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-link-remove {
+        display: inline-flex;
+        flex: 0 0 auto;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li {
+        position: relative;
+        padding-right: 26px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li .preview-inline-remove {
+        position: absolute;
+        right: 0;
+        top: 2px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li .preview-trip-drag {
+        position: absolute;
+        left: -2px;
+        top: 2px;
+        min-width: 22px;
+        width: 22px;
+        height: 22px;
+        padding: 0;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li {
+        padding-left: 24px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-shell.preview-drag-source,
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.preview-drag-source {
+        opacity: 0.5;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-shell.preview-drop-before::before,
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-shell.preview-drop-after::after {
+        content: '';
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        height: 3px;
+        border-radius: 999px;
+        background: #d4a373;
+        z-index: 5;
+        pointer-events: none;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-shell.preview-drop-before::before {
+        top: -5px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .preview-card-shell.preview-drop-after::after {
+        bottom: -5px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.preview-drop-before {
+        box-shadow: inset 0 3px 0 #d4a373;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.preview-drop-after {
+        box-shadow: inset 0 -3px 0 #d4a373;
+      }
+      .trip-list li.trip-transport {
+        padding-left: 0;
+      }
+      .trip-list li.trip-transport > .event-card.flight-options-compact {
+        margin-bottom: 0;
+      }
+      .trip-list li.trip-transport .flight-detail {
+        width: 100%;
+        aspect-ratio: 4 / 1.2;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list.preview-drop-before {
+        box-shadow: inset 0 3px 0 #d4a373;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list.preview-drop-after {
+        box-shadow: inset 0 -3px 0 #d4a373;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.trip-transport {
+        padding-left: 0;
+        padding-right: 0;
+        overflow: visible;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.trip-transport .preview-trip-drag {
+        left: -24px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.trip-transport .preview-inline-remove {
+        right: -24px;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"][data-builder-arrange-mode="1"] .trip-list li.trip-transport > .event-card {
+        margin-bottom: 0;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] .preview-quick-actions button {
+        border: 1px solid #d7e2ef;
+        border-radius: 999px;
+        background: #f4f8fd;
+        color: #334155;
+        font-size: 0.72rem;
+        font-weight: 800;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+      body[data-builder-preview="1"][data-builder-edit-mode="1"] .preview-quick-actions button:hover {
+        background: #e9f1fb;
+      }
+      .trip-list .todo .todo-check {
+        line-height: 1.45;
+      }
+      .flight-option.transport-flight .flight-detail {
+        border-left-color: #d4a373;
+      }
+      .flight-option.transport-train .flight-detail {
+        border-left-color: #2f88ff;
+        background: linear-gradient(180deg, #1b2c43 0%, #162334 100%);
+      }
+      .flight-option.transport-bus .flight-detail {
+        border-left-color: #33b36b;
+        background: linear-gradient(180deg, #1a2f2b 0%, #142520 100%);
+      }
+      .flight-option.transport-train .flight-middle-icon,
+      .flight-option.transport-train .airport-time {
+        color: #7fc1ff;
+      }
+      .flight-option.transport-bus .flight-middle-icon,
+      .flight-option.transport-bus .airport-time {
+        color: #7fe2a8;
+      }
+      .flight-option.transport-train .flight-subinfo {
+        color: #c6dbff;
+      }
+      .flight-option.transport-bus .flight-subinfo {
+        color: #c5f7d7;
+      }
+      .cost-panel {
+        border-radius: 22px;
+        border: 1px solid rgba(207, 220, 238, 0.95);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(245, 250, 255, 0.96) 100%);
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+        padding: 14px;
+      }
+      .cost-panel + .cost-panel {
+        margin-top: 16px;
+      }
+      .cost-panel-head {
+        display: grid;
+        gap: 5px;
+        margin-bottom: 10px;
+      }
+      .cost-panel-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .cost-panel h2 {
+        margin: 0;
+        font-size: 1.08rem;
+        letter-spacing: 0.2px;
+        color: #0f172a;
+      }
+      .cost-count-pill {
+        border: 1px solid #d7e4f5;
+        border-radius: 999px;
+        padding: 2px 9px;
+        background: #fff;
+        color: #4b5563;
+        font-size: 0.68rem;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+      .cost-panel-hint {
+        margin: 0;
+        font-size: 0.74rem;
+        color: #64748b;
+        line-height: 1.35;
+      }
+      .cost-summary {
+        margin-top: 0;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .cost-summary .pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border: 1px solid #dce6f4;
+        border-radius: 12px;
+        background: #fbfdff;
+        padding: 8px 10px;
+      }
+      .cost-summary .pill strong {
+        margin: 0;
+        font-size: 0.64rem;
+        color: #64748b;
+        font-weight: 900;
+        letter-spacing: 0.2px;
+      }
+      .cost-summary .pill span {
+        font-size: 0.84rem;
+        font-weight: 900;
+        color: #0f172a;
+        font-variant-numeric: tabular-nums;
+      }
+      .cost-member-strip {
+        margin-top: 10px;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(130px, 1fr);
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .cost-member-strip .pill {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        border: 1px solid #dce6f4;
+        border-radius: 12px;
+        background: #ffffff;
+        padding: 8px 10px;
+      }
+      .cost-member-strip .pill.cost-member-pill {
+        min-width: 130px;
+      }
+      .cost-member-strip .pill strong {
+        margin: 0;
+        font-size: 0.64rem;
+        color: #64748b;
+        font-weight: 900;
+        letter-spacing: 0.2px;
+      }
+      .cost-member-strip .pill span {
+        font-size: 0.84rem;
+        font-weight: 900;
+        color: #0f172a;
+        font-variant-numeric: tabular-nums;
+      }
+      .cost-settlement {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .cost-settle-item,
+      .cost-settle-empty {
+        border: 1px solid #d9e2ef;
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 0.7rem;
+        font-weight: 800;
+        background: #fff;
+      }
+      .cost-settle-empty {
+        color: #64748b;
+        background: #f7f9fc;
+      }
+      .cost-table-wrap {
+        display: none;
+      }
+      .cost-mobile-list {
+        margin-top: 10px;
+        display: grid;
+        gap: 9px;
+      }
+      .cost-mobile-card {
+        border: 1px solid #dbe7f4;
+        border-radius: 15px;
+        background: #fff;
+        padding: 10px 10px 9px;
+        display: grid;
+        gap: 9px;
+      }
+      .cost-mobile-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+        gap: 8px;
+      }
+      .cost-mobile-head h3 {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #0f172a;
+        line-height: 1.25;
+        word-break: break-word;
+      }
+      .cost-mobile-row-total {
+        font-size: 0.82rem;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        color: #334155;
+        border: 1px solid #dbe5f2;
+        border-radius: 999px;
+        padding: 3px 8px;
+        background: #f8fbff;
+        white-space: nowrap;
+      }
+      .cost-mobile-row-total.is-positive {
+        color: #166534;
+      }
+      .cost-mobile-row-total.is-negative {
+        color: #b91c1c;
+      }
+      .cost-mobile-values {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+      .cost-mobile-value {
+        border: 1px solid #e4ebf5;
+        border-radius: 11px;
+        background: #f8fbff;
+        padding: 6px 7px;
+        display: grid;
+        gap: 2px;
+      }
+      .cost-mobile-label {
+        font-size: 0.64rem;
+        color: #64748b;
+        font-weight: 800;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .cost-mobile-amount {
+        font-size: 0.8rem;
+        font-weight: 900;
+        color: #0f172a;
+        font-variant-numeric: tabular-nums;
+      }
+      .cost-mobile-amount.is-positive {
+        color: #166534;
+      }
+      .cost-mobile-amount.is-negative {
+        color: #b91c1c;
+      }
+      .cost-mobile-note {
+        font-size: 0.72rem;
+        color: #475569;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 6px 8px;
+        line-height: 1.35;
+        word-break: break-word;
+      }
+      .cost-mobile-separator {
+        border-top: 1px dashed #cfd9e7;
+        margin: 3px 4px;
+      }
+      .cost-mobile-empty {
+        font-size: 0.78rem;
+        color: #64748b;
+        text-align: center;
+        border: 1px dashed #cfdaea;
+        border-radius: 12px;
+        padding: 14px 10px;
+        background: #f8fbff;
+      }
+      @media (min-width: 900px) {
+        .cost-summary {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .cost-summary-main {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+        .cost-member-strip {
+          grid-auto-flow: row;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          overflow: visible;
+          padding-bottom: 0;
+        }
+        .cost-table-wrap {
+          display: block;
+          margin-top: 10px;
+          overflow-x: auto;
+          border: 1px solid #dbe5f2;
+          border-radius: 12px;
+          background: #fff;
+        }
+        .cost-mobile-list {
+          display: none;
+        }
+        .cost-table {
+          width: 100%;
+          border-collapse: collapse;
+          table-layout: auto;
+        }
+        .cost-table th,
+        .cost-table td {
+          border: 1px solid #e1e8f2;
+          padding: 9px 10px;
+          vertical-align: middle;
+          white-space: nowrap;
+        }
+        .cost-table th {
+          background: #f2f6fd;
+          font-size: 0.76rem;
+          font-weight: 900;
+          color: #334155;
+          white-space: nowrap;
+        }
+        .cost-table td.cost-cell-member,
+        .cost-table th.cost-cell-member {
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
+        .cost-table tr.cost-row.is-positive td.cost-cell-category {
+          color: #14532d;
+          font-weight: 700;
+        }
+        .cost-table tr.cost-row.is-negative td.cost-cell-category {
+          color: #7f1d1d;
+          font-weight: 700;
+        }
+        .cost-table tr.cost-row-empty td {
+          text-align: center;
+          color: #64748b;
+          padding: 16px 10px;
+          background: #f8fbff;
+        }
+        .cost-table td.cost-cell-category,
+        .cost-table td.cost-cell-note {
+          white-space: normal;
+        }
+      }
+      .bottom-nav {
+        padding: 10px 12px;
+      }
+      .bottom-nav a,
+      .bottom-nav a.active {
+        transform: none;
+        box-shadow: none;
+        transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+      }
+      .bottom-nav.scrolled {
+        padding: 4px 6px;
+      }
+      .bottom-nav.scrolled a.active {
+        height: 38px;
+        min-width: 44px;
+        padding: 0 16px;
+        transform: none;
+        box-shadow: none;
+      }
+      .preview-focus-flash {
+        outline: 2px solid rgba(212, 135, 66, 0.75);
+        box-shadow: 0 0 0 6px rgba(212, 135, 66, 0.28);
+        animation: previewFocusPulse 0.85s ease-out;
+      }
+      @keyframes previewFocusPulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(212, 135, 66, 0.35);
+        }
+        70% {
+          box-shadow: 0 0 0 12px rgba(212, 135, 66, 0.05);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(212, 135, 66, 0);
+        }
+      }
+    </style>
+</head>
+<body>
+  <div class="hero" style="background-image:url('https://d1grca2t3zpuug.cloudfront.net/2024/10/671da3a1be72a-870x500.webp');">
+    <p>3/30 - 4/8</p>
+    <h1>京阪行</h1>
+    <div class="hero-right">
+      <button class="hero-btn hero-btn--tab hero-btn--active" id="tabItinerary">旅行</button>
+      <button class="hero-btn hero-btn--tab" id="tabCost" style="display:none;">花費</button>
+    </div>
+  </div>
+
+  <div class="tab-content active" id="tabContentItinerary">
+    <div class="main-content">
+      
+        <section class="day-section" id="d01" data-preview-day-index="0">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">30</div>
+            <div class="day-info"><span data-preview-edit="day-date">March (週一)</span> | <span data-preview-edit="day-subtitle">到達日</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="media">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="media" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          
+        </div>
+      
+          
+          <div class="event-card event-card-photo-bg">
+            <div class="photo-carousel js-photo-carousel photo-carousel-full">
+              <div class="square-photo photo-carousel-track">
+                
+            <div class="photo-carousel-slide js-lightbox-photo" data-preview-edit="media-src" data-preview-media-index="0">
+              <img src="https://static.gltjp.com/glt/data/article/21000/20172/20230328_141351_efb395a7_w1920.webp" alt="旅遊照片 3" loading="lazy">
+              <button type="button" class="preview-inline-remove preview-media-remove" data-preview-action="remove-media" data-preview-media-index="0" aria-label="刪除整個圖片卡">X</button>
+            </div>
+          
+
+            <div class="photo-carousel-slide js-lightbox-photo" data-preview-edit="media-src" data-preview-media-index="1">
+              <img src="https://tenjo.tw/wp-content/uploads/JAP_6751-1.jpg" alt="旅遊照片 2" loading="lazy">
+              <button type="button" class="preview-inline-remove preview-media-remove" data-preview-action="remove-media" data-preview-media-index="1" aria-label="刪除整個圖片卡">X</button>
+            </div>
+          
+              </div>
+              <div class="photo-carousel-dots" aria-label="March (週一) 照片切換"></div>
+            </div>
+          </div>
+        
+        </div>
+      
+
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 3/30 | 道頓堀</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0"><a class="spot-link" href="https://maps.app.goo.gl/eg8V5RepC52ix71x6" target="_blank" rel="noopener" data-preview-edit="trip-link" data-preview-item-index="0">🏨 VIA INN 天王寺</a></span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="1">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="1" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="1">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="1"><a class="spot-link" href="https://maps.app.goo.gl/eT22VGw3ZWTUVjFv8" target="_blank" rel="noopener" data-preview-edit="trip-link" data-preview-item-index="1">🍣 大起水產 迴轉壽司</a></span>
+          <div class="note" data-preview-edit="trip-note" data-preview-item-index="1">晚上11:00關</div>
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="1" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="0">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d02" data-preview-day-index="1">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">31</div>
+            <div class="day-info"><span data-preview-edit="day-date">March (週二)</span> | <span data-preview-edit="day-subtitle">奈良一日遊</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="media">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="media" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          
+        </div>
+      
+          
+          <div class="event-card event-card-photo-bg">
+            <div class="photo-carousel js-photo-carousel photo-carousel-full">
+              <div class="square-photo photo-carousel-track">
+                
+            <div class="photo-carousel-slide js-lightbox-photo" data-preview-edit="media-src" data-preview-media-index="0">
+              <img src="https://i0.wp.com/journey.tw/wp-content/uploads/2024-04-02-155055-51.jpg?resize=1100%2C734&amp;quality=99&amp;ssl=1" alt="旅遊照片 1" loading="lazy">
+              <button type="button" class="preview-inline-remove preview-media-remove" data-preview-action="remove-media" data-preview-media-index="0" aria-label="刪除整個圖片卡">X</button>
+            </div>
+          
+              </div>
+              <div class="photo-carousel-dots" aria-label="March (週二) 照片切換"></div>
+            </div>
+          </div>
+        
+        </div>
+      
+
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 3/31 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0"><a class="spot-link" href="https://maps.app.goo.gl/hhy1LQQQGmcmcnWs7" target="_blank" rel="noopener" data-preview-edit="trip-link" data-preview-item-index="0">🍜 雞湯拉麵 座銀</a></span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="1">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="1" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="1">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="1">🗼 通天閣</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="1" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="2">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="2" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="2">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="2">🍡 新世界本通商店街</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="2" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="1">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d03" data-preview-day-index="2">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">1</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週三)</span> | <span data-preview-edit="day-subtitle">市區行程</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="media">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="media" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          
+        </div>
+      
+          
+          <div class="event-card event-card-photo-bg">
+            <div class="photo-carousel js-photo-carousel photo-carousel-full">
+              <div class="square-photo photo-carousel-track">
+                
+            <div class="photo-carousel-slide js-lightbox-photo" data-preview-edit="media-src" data-preview-media-index="0">
+              <img src="https://static.gltjp.com/glt/data/article/21000/20172/20221231_163104_be5a328e_w1920.webp" alt="旅遊照片 1" loading="lazy">
+              <button type="button" class="preview-inline-remove preview-media-remove" data-preview-action="remove-media" data-preview-media-index="0" aria-label="刪除整個圖片卡">X</button>
+            </div>
+          
+
+            <div class="photo-carousel-slide js-lightbox-photo" data-preview-edit="media-src" data-preview-media-index="1">
+              <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiYfRcWAXmea86Tv0t0wVgKX_HsHFXDHVMYIeRX5zAChfc2t1OH_F1HtT1SUS2G1VfMfpiSwgldsDUq1KH9sMQuYsussmKI67K7OgecttjH3bOtOaY0ZFfmoaK5Hif7Vmb2-lkwHgDKpewsq48LSUu5tK0aznUu5D5lgkor_FUMdnd4I3sHsJbyV9dK/s690/0.JPG" alt="旅遊照片 2" loading="lazy">
+              <button type="button" class="preview-inline-remove preview-media-remove" data-preview-action="remove-media" data-preview-media-index="1" aria-label="刪除整個圖片卡">X</button>
+            </div>
+          
+              </div>
+              <div class="photo-carousel-dots" aria-label="April (週三) 照片切換"></div>
+            </div>
+          </div>
+        
+        </div>
+      
+
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/1 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0"><a class="spot-link" href="https://maps.app.goo.gl/z9BoqbZHyMX9pwU38" target="_blank" rel="noopener" data-preview-edit="trip-link" data-preview-item-index="0">🍰 Harbs 午餐</a></span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="1">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="1" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="1">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="1">🏯 大阪城</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="1" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="2">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="2" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="2">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="2">🛍️ 梅田逛街</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="2" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="3">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="3" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="3">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="3"><a class="spot-link" href="https://maps.app.goo.gl/qrAC9m5RzRuwtqAm7" target="_blank" rel="noopener" data-preview-edit="trip-link" data-preview-item-index="3">🌸 毛馬櫻之宮</a></span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="3" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="2">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d04" data-preview-day-index="3">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">2</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週四)</span> | <span data-preview-edit="day-subtitle">環球影城</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="media">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="media" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          
+        </div>
+      
+          
+          <div class="event-card event-card-photo-bg">
+            <div class="photo-carousel js-photo-carousel photo-carousel-full">
+              <div class="square-photo photo-carousel-track">
+                
+            <div class="photo-carousel-slide js-lightbox-photo" data-preview-edit="media-src" data-preview-media-index="0">
+              <img src="https://d1grca2t3zpuug.cloudfront.net/2023/05/usjticket01.jpg" alt="旅遊照片 1" loading="lazy">
+              <button type="button" class="preview-inline-remove preview-media-remove" data-preview-action="remove-media" data-preview-media-index="0" aria-label="刪除整個圖片卡">X</button>
+            </div>
+          
+              </div>
+              <div class="photo-carousel-dots" aria-label="April (週四) 照片切換"></div>
+            </div>
+          </div>
+        
+        </div>
+      
+
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/2 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0">📍 點擊輸入行程</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="3">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d05" data-preview-day-index="4">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">3</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週五)</span> | <span data-preview-edit="day-subtitle">Day 5</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/3 | 行程</div>
+            <ul class="trip-list">
+              
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="4">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d06" data-preview-day-index="5">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">4</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週六)</span> | <span data-preview-edit="day-subtitle">前往京都</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/4 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0">🧳 京都站寄放行李</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="1">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="1" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="1">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="1"><a class="spot-link" href="https://maps.app.goo.gl/kxbmUGV2t2v3FXfR6" target="_blank" rel="noopener" data-preview-edit="trip-link" data-preview-item-index="1">🏩 民宿金魚家</a></span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="1" aria-label="刪除此行程">X</button>
+        </li>
+      
+
+        <li data-preview-trip-item="1" data-preview-item-index="2">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="2" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="2">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="2">🚇 前往宇治</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="2" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="5">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d07" data-preview-day-index="6">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">5</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週日)</span> | <span data-preview-edit="day-subtitle">Day 7</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/5 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0">📍 點擊輸入行程</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="6">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d08" data-preview-day-index="7">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">6</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週一)</span> | <span data-preview-edit="day-subtitle">Day 8</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/6 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0">🌸 清水寺</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="7">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d09" data-preview-day-index="8">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">7</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週二)</span> | <span data-preview-edit="day-subtitle">Day 9</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/7 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0">📍 點擊輸入行程</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="8">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+
+        <section class="day-section" id="d10" data-preview-day-index="9">
+          <div class="day-header">
+            <div class="day-num" data-preview-edit="day-num">8</div>
+            <div class="day-info"><span data-preview-edit="day-date">April (週三)</span> | <span data-preview-edit="day-subtitle">返家日</span></div>
+          </div>
+          <div class="event-wrapper">
+            
+        <div class="preview-card-shell" data-preview-card-key="trip">
+          
+        <div class="preview-card-tools">
+          <button type="button" class="preview-drag-handle" data-preview-drag="card" data-preview-card-key="trip" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <button type="button" data-preview-action="disable-card" data-preview-card-key="trip" title="停用此卡片">X</button>
+        </div>
+      
+          
+          <div class="event-card">
+            <div class="event-title" data-preview-edit="trip-title">📅 4/8 | 行程</div>
+            <ul class="trip-list">
+              
+        <li data-preview-trip-item="1" data-preview-item-index="0">
+          <button type="button" class="preview-drag-handle preview-trip-drag" data-preview-drag="trip-item" data-preview-item-index="0" draggable="true" aria-label="拖曳排序" title="拖曳排序">⋮⋮</button>
+          <span class="time is-time-hidden" data-preview-edit="trip-time" data-preview-item-index="0">--:--</span>
+          <span data-preview-edit="trip-text" data-preview-item-index="0">🛍 臨空城Outlet</span>
+          
+          <button type="button" class="preview-inline-remove" data-preview-action="remove-trip-item" data-preview-item-index="0" aria-label="刪除此行程">X</button>
+        </li>
+      
+            </ul>
+          </div>
+        
+        </div>
+      
+          </div>
+          <div class="preview-quick-actions" data-preview-day-index="9">
+            <button type="button" data-preview-action="open-media-draft">＋圖/影片</button>
+            <button type="button" data-preview-action="add-trip-item">＋行程</button>
+            <button type="button" data-preview-action="add-transport">＋交通卡</button>
+          </div>
+        </section>
+      
+    </div>
+  </div>
+
+  
+  <div class="tab-content" id="tabContentCost">
+    <div class="main-content">
+      <div class="cost-panel"><h2>尚未設定花費表</h2></div>
+    </div>
+  </div>
+
+  
+  <nav class="bottom-nav">
+    
+  </nav>
+  <span id="costTotal" style="display:none;"></span>
+
+  
+  <script id="tripBuilderStateSeed" type="application/json">{"__tripBuilderState":true,"version":1,"savedAt":"2026-03-22T17:24:51.898Z","state":{"meta":{"lang":"zh-Hant","title":"YU的京阪行","heroRange":"3/30 - 4/8","heroTitle":"京阪行","heroBackgroundImage":"https://d1grca2t3zpuug.cloudfront.net/2024/10/671da3a1be72a-870x500.webp","themeColor":"#fdfaf6","itineraryTabLabel":"旅行","costTabLabel":"花費"},"schedule":{"startYear":2026,"startMonth":3,"startDay":30,"dayCount":10},"features":{"costTab":false,"bottomNav":false,"lightbox":false,"videoFocus":false,"cardHighlight":true},"previewDevice":"430x932","previewScaleMode":"auto","previewShell":false,"previewEditMode":true,"arrangeTools":true,"activeDayIndex":2,"days":[{"id":"d01","dayNum":"30","dateLabel":"March (週一)","subtitle":"到達日","navLabel":"30","enableMedia":true,"mediaTitle":"📅 3/03｜照片","mediaLines":"https://static.gltjp.com/glt/data/article/21000/20172/20230328_141351_efb395a7_w1920.webp|旅遊照片 3\nhttps://tenjo.tw/wp-content/uploads/JAP_6751-1.jpg|旅遊照片 2","enableTrip":true,"tripTitle":"📅 3/30 | 道頓堀","tripItems":[{"kind":"normal","checked":false,"time":"","text":"🏨 VIA INN 天王寺","note":"","linkHref":"https://maps.app.goo.gl/eg8V5RepC52ix71x6","linkLabel":"🏨 VIA INN 天王寺"},{"kind":"normal","checked":false,"time":"","text":"🍣 大起水產 迴轉壽司","note":"晚上11:00關","linkHref":"https://maps.app.goo.gl/eT22VGw3ZWTUVjFv8","linkLabel":"🍣 大起水產 迴轉壽司"}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d02","dayNum":"31","dateLabel":"March (週二)","subtitle":"奈良一日遊","navLabel":"31","enableMedia":true,"mediaTitle":"📅 3/04｜照片","mediaLines":"https://i0.wp.com/journey.tw/wp-content/uploads/2024-04-02-155055-51.jpg?resize=1100%2C734&quality=99&ssl=1|旅遊照片 1","enableTrip":true,"tripTitle":"📅 3/31 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"🍜 雞湯拉麵 座銀","note":"","linkHref":"https://maps.app.goo.gl/hhy1LQQQGmcmcnWs7","linkLabel":"🍜 雞湯拉麵 座銀"},{"kind":"normal","checked":false,"time":"","text":"🗼 通天閣","note":"","linkHref":"","linkLabel":""},{"kind":"normal","checked":false,"time":"","text":"🍡 新世界本通商店街","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d03","dayNum":"1","dateLabel":"April (週三)","subtitle":"市區行程","navLabel":"1","enableMedia":true,"mediaTitle":"📅 3/05｜照片","mediaLines":"https://static.gltjp.com/glt/data/article/21000/20172/20221231_163104_be5a328e_w1920.webp|旅遊照片 1\nhttps://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiYfRcWAXmea86Tv0t0wVgKX_HsHFXDHVMYIeRX5zAChfc2t1OH_F1HtT1SUS2G1VfMfpiSwgldsDUq1KH9sMQuYsussmKI67K7OgecttjH3bOtOaY0ZFfmoaK5Hif7Vmb2-lkwHgDKpewsq48LSUu5tK0aznUu5D5lgkor_FUMdnd4I3sHsJbyV9dK/s690/0.JPG|旅遊照片 2","enableTrip":true,"tripTitle":"📅 4/1 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"🍰 Harbs 午餐","note":"","linkHref":"https://maps.app.goo.gl/z9BoqbZHyMX9pwU38","linkLabel":"🍰 Harbs 午餐"},{"kind":"normal","checked":false,"time":"","text":"🏯 大阪城","note":"","linkHref":"","linkLabel":""},{"kind":"normal","checked":false,"time":"","text":"🛍️ 梅田逛街","note":"","linkHref":"","linkLabel":""},{"kind":"normal","checked":false,"time":"","text":"🌸 毛馬櫻之宮","note":"","linkHref":"https://maps.app.goo.gl/qrAC9m5RzRuwtqAm7","linkLabel":"🌸 毛馬櫻之宮"}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d04","dayNum":"2","dateLabel":"April (週四)","subtitle":"環球影城","navLabel":"2","enableMedia":true,"mediaTitle":"📅 3/06｜照片","mediaLines":"https://d1grca2t3zpuug.cloudfront.net/2023/05/usjticket01.jpg|旅遊照片 1","enableTrip":true,"tripTitle":"📅 4/2 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"📍 點擊輸入行程","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d05","dayNum":"3","dateLabel":"April (週五)","subtitle":"Day 5","navLabel":"3","enableMedia":false,"mediaTitle":"📅 3/07｜照片","mediaLines":"","enableTrip":true,"tripTitle":"📅 4/3 | 行程","tripItems":[],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d06","dayNum":"4","dateLabel":"April (週六)","subtitle":"前往京都","navLabel":"4","enableMedia":false,"mediaTitle":"📅 3/08｜照片","mediaLines":"","enableTrip":true,"tripTitle":"📅 4/4 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"🧳 京都站寄放行李","note":"","linkHref":"","linkLabel":""},{"kind":"normal","checked":false,"time":"","text":"🏩 民宿金魚家","note":"","linkHref":"https://maps.app.goo.gl/kxbmUGV2t2v3FXfR6","linkLabel":"🏩 民宿金魚家"},{"kind":"normal","checked":false,"time":"","text":"🚇 前往宇治","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d07","dayNum":"5","dateLabel":"April (週日)","subtitle":"Day 7","navLabel":"5","enableMedia":false,"mediaTitle":"📅 3/09｜照片","mediaLines":"","enableTrip":true,"tripTitle":"📅 4/5 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"📍 點擊輸入行程","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d08","dayNum":"6","dateLabel":"April (週一)","subtitle":"Day 8","navLabel":"6","enableMedia":false,"mediaTitle":"📅 3/10｜照片","mediaLines":"","enableTrip":true,"tripTitle":"📅 4/6 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"🌸 清水寺","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d09","dayNum":"7","dateLabel":"April (週二)","subtitle":"Day 9","navLabel":"7","enableMedia":false,"mediaTitle":"📅 3/11｜照片","mediaLines":"","enableTrip":true,"tripTitle":"📅 4/7 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"📍 點擊輸入行程","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]},{"id":"d10","dayNum":"8","dateLabel":"April (週三)","subtitle":"返家日","navLabel":"8","enableMedia":false,"mediaTitle":"📅 3/12｜照片","mediaLines":"","enableTrip":true,"tripTitle":"📅 4/8 | 行程","tripItems":[{"kind":"normal","checked":false,"time":"","text":"🛍 臨空城Outlet","note":"","linkHref":"","linkLabel":""}],"enableTransport":false,"transportCards":[],"cardOrder":["media","trip"]}],"costPanels":[{"title":"總花費","hint":"正數=支出，負數=收回。","members":[{"id":"chen","label":"CHEN"},{"id":"liu","label":"LIU"},{"id":"hsu","label":"HSU"}],"rows":[{"type":"item","category":"累積待收","values":{"chen":"","liu":"","hsu":"-11,466"},"note":""},{"type":"separator"},{"type":"item","category":"機票花費","values":{"chen":"27,606","liu":"23,674","hsu":"23,707"},"note":"預計 1/18 收款"},{"type":"item","category":"住宿花費","values":{"chen":"4,675","liu":"4,675","hsu":"4,072"},"note":""},{"type":"item","category":"票券花費","values":{"chen":"2,755","liu":"2,755","hsu":"2,755"},"note":""},{"type":"item","category":"匯款 2/27 tesfan","values":{"chen":"","liu":"","hsu":"-11,000"},"note":"國泰收款"}]}]}}</script>
+  <script id="tripDataSeed" type="application/json">{"meta":{"lang":"zh-Hant","title":"YU的京阪行","themeColor":"#fdfaf6","heroRange":"3/30 - 4/8","heroTitle":"京阪行","heroBackgroundImage":"https://d1grca2t3zpuug.cloudfront.net/2024/10/671da3a1be72a-870x500.webp","itineraryTabLabel":"旅行","costTabLabel":"花費"},"features":{"costTab":false,"bottomNav":false,"lightbox":false,"videoFocus":false,"cardHighlight":true},"days":[{"id":"d01","editorDayIndex":0,"dayNum":"30","dateLabel":"March (週一)","subtitle":"到達日","navLabel":"30","cards":[{"type":"media","editorCardKey":"media","title":"📅 3/03｜照片","dotsLabel":"March (週一) 照片切換","media":[{"type":"image","src":"https://static.gltjp.com/glt/data/article/21000/20172/20230328_141351_efb395a7_w1920.webp","alt":"旅遊照片 3","poster":"","editorMediaIndex":0},{"type":"image","src":"https://tenjo.tw/wp-content/uploads/JAP_6751-1.jpg","alt":"旅遊照片 2","poster":"","editorMediaIndex":1}]},{"type":"trip-list","editorCardKey":"trip","title":"📅 3/30 | 道頓堀","items":[{"hiddenTime":true,"text":"🏨 VIA INN 天王寺","editorItemIndex":0,"html":"\u003ca class=\"spot-link\" href=\"https://maps.app.goo.gl/eg8V5RepC52ix71x6\" target=\"_blank\" rel=\"noopener\" data-preview-edit=\"trip-link\" data-preview-item-index=\"0\">🏨 VIA INN 天王寺\u003c/a>","note":""},{"hiddenTime":true,"text":"🍣 大起水產 迴轉壽司","editorItemIndex":1,"html":"\u003ca class=\"spot-link\" href=\"https://maps.app.goo.gl/eT22VGw3ZWTUVjFv8\" target=\"_blank\" rel=\"noopener\" data-preview-edit=\"trip-link\" data-preview-item-index=\"1\">🍣 大起水產 迴轉壽司\u003c/a>","note":"晚上11:00關"}]}]},{"id":"d02","editorDayIndex":1,"dayNum":"31","dateLabel":"March (週二)","subtitle":"奈良一日遊","navLabel":"31","cards":[{"type":"media","editorCardKey":"media","title":"📅 3/04｜照片","dotsLabel":"March (週二) 照片切換","media":[{"type":"image","src":"https://i0.wp.com/journey.tw/wp-content/uploads/2024-04-02-155055-51.jpg?resize=1100%2C734&quality=99&ssl=1","alt":"旅遊照片 1","poster":"","editorMediaIndex":0}]},{"type":"trip-list","editorCardKey":"trip","title":"📅 3/31 | 行程","items":[{"hiddenTime":true,"text":"🍜 雞湯拉麵 座銀","editorItemIndex":0,"html":"\u003ca class=\"spot-link\" href=\"https://maps.app.goo.gl/hhy1LQQQGmcmcnWs7\" target=\"_blank\" rel=\"noopener\" data-preview-edit=\"trip-link\" data-preview-item-index=\"0\">🍜 雞湯拉麵 座銀\u003c/a>","note":""},{"hiddenTime":true,"text":"🗼 通天閣","editorItemIndex":1,"note":""},{"hiddenTime":true,"text":"🍡 新世界本通商店街","editorItemIndex":2,"note":""}]}]},{"id":"d03","editorDayIndex":2,"dayNum":"1","dateLabel":"April (週三)","subtitle":"市區行程","navLabel":"1","cards":[{"type":"media","editorCardKey":"media","title":"📅 3/05｜照片","dotsLabel":"April (週三) 照片切換","media":[{"type":"image","src":"https://static.gltjp.com/glt/data/article/21000/20172/20221231_163104_be5a328e_w1920.webp","alt":"旅遊照片 1","poster":"","editorMediaIndex":0},{"type":"image","src":"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiYfRcWAXmea86Tv0t0wVgKX_HsHFXDHVMYIeRX5zAChfc2t1OH_F1HtT1SUS2G1VfMfpiSwgldsDUq1KH9sMQuYsussmKI67K7OgecttjH3bOtOaY0ZFfmoaK5Hif7Vmb2-lkwHgDKpewsq48LSUu5tK0aznUu5D5lgkor_FUMdnd4I3sHsJbyV9dK/s690/0.JPG","alt":"旅遊照片 2","poster":"","editorMediaIndex":1}]},{"type":"trip-list","editorCardKey":"trip","title":"📅 4/1 | 行程","items":[{"hiddenTime":true,"text":"🍰 Harbs 午餐","editorItemIndex":0,"html":"\u003ca class=\"spot-link\" href=\"https://maps.app.goo.gl/z9BoqbZHyMX9pwU38\" target=\"_blank\" rel=\"noopener\" data-preview-edit=\"trip-link\" data-preview-item-index=\"0\">🍰 Harbs 午餐\u003c/a>","note":""},{"hiddenTime":true,"text":"🏯 大阪城","editorItemIndex":1,"note":""},{"hiddenTime":true,"text":"🛍️ 梅田逛街","editorItemIndex":2,"note":""},{"hiddenTime":true,"text":"🌸 毛馬櫻之宮","editorItemIndex":3,"html":"\u003ca class=\"spot-link\" href=\"https://maps.app.goo.gl/qrAC9m5RzRuwtqAm7\" target=\"_blank\" rel=\"noopener\" data-preview-edit=\"trip-link\" data-preview-item-index=\"3\">🌸 毛馬櫻之宮\u003c/a>","note":""}]}]},{"id":"d04","editorDayIndex":3,"dayNum":"2","dateLabel":"April (週四)","subtitle":"環球影城","navLabel":"2","cards":[{"type":"media","editorCardKey":"media","title":"📅 3/06｜照片","dotsLabel":"April (週四) 照片切換","media":[{"type":"image","src":"https://d1grca2t3zpuug.cloudfront.net/2023/05/usjticket01.jpg","alt":"旅遊照片 1","poster":"","editorMediaIndex":0}]},{"type":"trip-list","editorCardKey":"trip","title":"📅 4/2 | 行程","items":[{"hiddenTime":true,"text":"📍 點擊輸入行程","editorItemIndex":0,"note":""}]}]},{"id":"d05","editorDayIndex":4,"dayNum":"3","dateLabel":"April (週五)","subtitle":"Day 5","navLabel":"3","cards":[{"type":"trip-list","editorCardKey":"trip","title":"📅 4/3 | 行程","items":[]}]},{"id":"d06","editorDayIndex":5,"dayNum":"4","dateLabel":"April (週六)","subtitle":"前往京都","navLabel":"4","cards":[{"type":"trip-list","editorCardKey":"trip","title":"📅 4/4 | 行程","items":[{"hiddenTime":true,"text":"🧳 京都站寄放行李","editorItemIndex":0,"note":""},{"hiddenTime":true,"text":"🏩 民宿金魚家","editorItemIndex":1,"html":"\u003ca class=\"spot-link\" href=\"https://maps.app.goo.gl/kxbmUGV2t2v3FXfR6\" target=\"_blank\" rel=\"noopener\" data-preview-edit=\"trip-link\" data-preview-item-index=\"1\">🏩 民宿金魚家\u003c/a>","note":""},{"hiddenTime":true,"text":"🚇 前往宇治","editorItemIndex":2,"note":""}]}]},{"id":"d07","editorDayIndex":6,"dayNum":"5","dateLabel":"April (週日)","subtitle":"Day 7","navLabel":"5","cards":[{"type":"trip-list","editorCardKey":"trip","title":"📅 4/5 | 行程","items":[{"hiddenTime":true,"text":"📍 點擊輸入行程","editorItemIndex":0,"note":""}]}]},{"id":"d08","editorDayIndex":7,"dayNum":"6","dateLabel":"April (週一)","subtitle":"Day 8","navLabel":"6","cards":[{"type":"trip-list","editorCardKey":"trip","title":"📅 4/6 | 行程","items":[{"hiddenTime":true,"text":"🌸 清水寺","editorItemIndex":0,"note":""}]}]},{"id":"d09","editorDayIndex":8,"dayNum":"7","dateLabel":"April (週二)","subtitle":"Day 9","navLabel":"7","cards":[{"type":"trip-list","editorCardKey":"trip","title":"📅 4/7 | 行程","items":[{"hiddenTime":true,"text":"📍 點擊輸入行程","editorItemIndex":0,"note":""}]}]},{"id":"d10","editorDayIndex":9,"dayNum":"8","dateLabel":"April (週三)","subtitle":"返家日","navLabel":"8","cards":[{"type":"trip-list","editorCardKey":"trip","title":"📅 4/8 | 行程","items":[{"hiddenTime":true,"text":"🛍 臨空城Outlet","editorItemIndex":0,"note":""}]}]}],"bottomNav":[],"costPanels":[]}</script>
+  <script>window.__TRIP_NAV_MAP__ = {}; window.__TRIP_FEATURES__ = {"costTab":false,"bottomNav":false,"lightbox":false,"videoFocus":false,"cardHighlight":true}; window.__TRIP_BUILDER_PREVIEW__ = false; window.__TRIP_BUILDER_EDIT_MODE__ = false; window.__TRIP_BUILDER_ARRANGE_MODE__ = false; // 滾動觀察者：當滑動到對應區域時，自動更新按鈕狀態
+    const sections = document.querySelectorAll('.day-section');
+    const navLinks = document.querySelectorAll('.bottom-nav a');
+    const bottomNav = document.querySelector('.bottom-nav');
+    const FEATURES = window.__TRIP_FEATURES__ || {};
+
+    // 定義頁面區塊對應底部導航的 mapping
+    // 「去程」: d3, d4
+    // 「AUH」: d5, d6, d7
+    // 「BUD」: d8, ...
+    // 「VIE」: d10, ...
+    // 「回程」: d12, d14
+    function getActiveNavId(currentSectionId) {
+        // d3, d4 → 去程 (#d3)
+        if (currentSectionId === 'd3' || currentSectionId === 'd4') {
+            return '#d3';
+        }
+        // d5, d6, d7 → AUH (#d5)
+        if (currentSectionId === 'd5' || currentSectionId === 'd6' || currentSectionId === 'd7') {
+            return '#d5';
+        }
+        // d8, d9 → BUD (#d8)
+        if (currentSectionId === 'd8' || currentSectionId === 'd9') {
+            return '#d8';
+        }
+        // d10, d11 → VIE (#d10)
+        if (currentSectionId === 'd10' || currentSectionId === 'd11') {
+            return '#d10';
+        }
+        // d12, d13, d14 → 回程 (#d12)
+        if (currentSectionId === 'd12' || currentSectionId === 'd13' || currentSectionId === 'd14') {
+            return '#d12';
+        }
+        // fallback: 若找不到則預設第一個
+        return '#d3';
+    }
+
+    // 控制縮小/展開狀態
+    let navManuallyExpanded = false;
+    let lastScrollY = window.scrollY;
+    let scrollDirection = null; // "up" or "down"
+
+    function clearNavCollapseTimer() {
+        // 已停用「秒數後自動收縮」
+    }
+
+    // 已停用「停止滾動後幾秒收合」
+    function scheduleNavIdleCollapse() {
+        // no-op
+    }
+
+    // 切換 active 狀態和自動縮放
+    window.addEventListener('scroll', () => {
+        let current = "";
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= (sectionTop - 150)) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        // 根據目前 section id 取得應該 active 的底部導航 href
+        const activeNavHref = getActiveNavId(current);
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === activeNavHref) {
+                link.classList.add('active');
+            }
+        });
+
+        // 判斷滑動方向
+        let currentScrollY = window.scrollY;
+        if (currentScrollY > lastScrollY) {
+            scrollDirection = "down";
+        } else if (currentScrollY < lastScrollY) {
+            scrollDirection = "up";
+        }
+        lastScrollY = currentScrollY;
+
+        // 手動展開時：只要有滾動就重置「靜止後收合」計時器
+        if (navManuallyExpanded) {
+            if (window.scrollY <= 90) {
+                bottomNav.classList.remove('scrolled');
+                clearNavCollapseTimer();
+                return;
+            }
+
+            // 手動展開後只要往下滑，立即恢復收合
+            if (scrollDirection === "down") {
+                bottomNav.classList.add('scrolled');
+                navManuallyExpanded = false;
+                clearNavCollapseTimer();
+                return;
+            }
+
+            // 其餘情況（停住/往上）維持展開，並在靜止後收合
+            bottomNav.classList.remove('scrolled');
+            scheduleNavIdleCollapse();
+            return;
+        }
+
+        // 滑動時自動縮小/展開底部導航（如果不是手動展開）
+        if (!navManuallyExpanded) {
+            if (window.scrollY > 90) {
+                if (scrollDirection === "down") {
+                    bottomNav.classList.add('scrolled');
+                    clearNavCollapseTimer();
+                } else if (scrollDirection === "up") {
+                    // 向上滑動時，自動展開，並在停止滾動後才收合
+                    if (bottomNav.classList.contains('scrolled')) {
+                        bottomNav.classList.remove('scrolled');
+                    }
+                    if (!bottomNav.classList.contains('scrolled')) {
+                        scheduleNavIdleCollapse();
+                    }
+                }
+            } else {
+                bottomNav.classList.remove('scrolled');
+                clearNavCollapseTimer();
+            }
+        }
+    });
+
+    // 點擊縮小模式下的 active 按鈕可展開/收回
+    bottomNav.addEventListener('click', function(e) {
+        let target = (e.target && e.target.closest) ? e.target.closest('a') : null;
+        if (!target && e.target && e.target.nodeType === 3 && e.target.parentElement) {
+            target = e.target.parentElement.closest('a');
+        }
+        if (!target) return;
+
+        // 點擊任一導航後，恢復自動收合模式
+        if (navManuallyExpanded) {
+            navManuallyExpanded = false;
+            clearNavCollapseTimer();
+        }
+
+        // 僅在縮小模式下，且點到 .active 的 a
+        if (bottomNav.classList.contains('scrolled')) {
+            // 如果點擊的是 a.active
+            if (target.tagName === 'A' && target.classList.contains('active')) {
+                e.preventDefault();
+                clearNavCollapseTimer();
+                // 切換 scrolled 狀態
+                if (bottomNav.classList.contains('scrolled')) {
+                    bottomNav.classList.remove('scrolled');
+                    navManuallyExpanded = true;
+                    scheduleNavIdleCollapse();
+                } else {
+                    bottomNav.classList.add('scrolled');
+                    navManuallyExpanded = false;
+                }
+            }
+        }
+    });
+
+    // 當點擊其他區域，若展開則恢復自動縮放
+    document.addEventListener('click', function(e) {
+        // 若已展開，且點擊非 bottomNav 內部
+        if (navManuallyExpanded && !bottomNav.contains(e.target)) {
+            navManuallyExpanded = false;
+            clearNavCollapseTimer();
+            if (window.scrollY > 90) {
+                bottomNav.classList.add('scrolled');
+            }
+        }
+    });
+
+// ===== 圖片輪播（可左右滑動） =====
+    const photoCarousels = document.querySelectorAll('.js-photo-carousel');
+    let activeFocusedVideo = null;
+
+    function setFocusedVideo(nextVideo) {
+        if (!FEATURES.videoFocus) nextVideo = null;
+        if (activeFocusedVideo === nextVideo) return;
+        const previousSlide = activeFocusedVideo ? activeFocusedVideo.closest('.photo-carousel-slide') : null;
+        if (activeFocusedVideo) {
+            activeFocusedVideo.classList.remove('video-focus-playing');
+        }
+        if (previousSlide) {
+            previousSlide.classList.remove('video-focus-active');
+        }
+        activeFocusedVideo = nextVideo;
+        if (activeFocusedVideo) {
+            activeFocusedVideo.classList.add('video-focus-playing');
+            const nextSlide = activeFocusedVideo.closest('.photo-carousel-slide');
+            if (nextSlide) {
+                nextSlide.classList.add('video-focus-active');
+            }
+        }
+    }
+
+    photoCarousels.forEach(carousel => {
+        const track = carousel.querySelector('.photo-carousel-track');
+        const slides = Array.from(carousel.querySelectorAll('.photo-carousel-slide'));
+        const dotsWrap = carousel.querySelector('.photo-carousel-dots');
+        let clearScrollStateTimer = null;
+
+        if (!track || !dotsWrap || slides.length === 0) return;
+        if (slides.length === 1) {
+            dotsWrap.style.display = 'none';
+            return;
+        }
+
+        dotsWrap.innerHTML = '';
+        const counter = document.createElement('span');
+        counter.className = 'photo-carousel-counter';
+        dotsWrap.appendChild(counter);
+
+        let activeIndex = 0;
+        let touchStartX = null;
+        let touchStartIndex = 0;
+        let ticking = false;
+        let viewportSyncTicking = false;
+        let carouselInView = false;
+        const syncTrackHeightToActiveSlide = () => {
+            if (!carousel.classList.contains('photo-carousel-full')) return;
+            const trackWidth = track.clientWidth;
+            if (trackWidth > 0) {
+                track.style.height = `${Math.ceil(trackWidth)}px`;
+            }
+        };
+
+        const syncVideoPlayback = () => {
+            if (!FEATURES.videoFocus) {
+                slides.forEach((slide) => {
+                    const video = slide.querySelector('video');
+                    if (!video) return;
+                    if (!video.paused) {
+                        video.pause();
+                    }
+                    if (video.currentTime !== 0) {
+                        try {
+                            video.currentTime = 0;
+                        } catch (_) {}
+                    }
+                });
+                setFocusedVideo(null);
+                return;
+            }
+            let hasActiveVideo = false;
+            let activeVideo = null;
+            const slideWidth = track.clientWidth || 1;
+            const centeredTolerance = Math.max(14, slideWidth * 0.08);
+            const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+            const carouselRect = carousel.getBoundingClientRect();
+            const carouselCenterY = carouselRect.top + carouselRect.height / 2;
+            const viewportCenterY = viewportHeight / 2;
+            const viewportCenterTolerance = Math.max(90, Math.min(180, viewportHeight * 0.18));
+            const carouselCenteredInViewport =
+                carouselInView &&
+                carouselRect.bottom > 0 &&
+                carouselRect.top < viewportHeight &&
+                Math.abs(carouselCenterY - viewportCenterY) <= viewportCenterTolerance;
+            slides.forEach((slide, index) => {
+                const video = slide.querySelector('video');
+                if (!video) return;
+
+                const shouldPlay =
+                    carouselCenteredInViewport &&
+                    Math.abs(track.scrollLeft - (index * slideWidth)) <= centeredTolerance;
+                if (shouldPlay) {
+                    hasActiveVideo = true;
+                    activeVideo = video;
+                    const playPromise = video.play();
+                    if (playPromise && typeof playPromise.catch === 'function') {
+                        playPromise.catch(() => {});
+                    }
+                    return;
+                }
+                if (!video.paused) {
+                    video.pause();
+                }
+                if (video.currentTime !== 0) {
+                    try {
+                        video.currentTime = 0;
+                    } catch (_) {}
+                }
+            });
+
+            if (hasActiveVideo) {
+                setFocusedVideo(activeVideo);
+                return;
+            }
+            if (activeFocusedVideo && activeFocusedVideo.closest('.js-photo-carousel') === carousel) {
+                setFocusedVideo(null);
+            }
+        };
+
+        slides.forEach((slide) => {
+            const img = slide.querySelector('img');
+            if (img) {
+                img.addEventListener('load', () => {
+                    if (slide !== slides[activeIndex]) return;
+                    syncTrackHeightToActiveSlide();
+                });
+            }
+
+            const video = slide.querySelector('video');
+            if (video) {
+                video.muted = true;
+                video.defaultMuted = true;
+                video.loop = true;
+                video.playsInline = true;
+                video.addEventListener('loadedmetadata', () => {
+                    if (slide !== slides[activeIndex]) return;
+                    syncTrackHeightToActiveSlide();
+                });
+            }
+        });
+
+        const updateActiveDot = () => {
+            const slideWidth = track.clientWidth || 1;
+            activeIndex = Math.max(
+                0,
+                Math.min(slides.length - 1, Math.round(track.scrollLeft / slideWidth))
+            );
+            counter.textContent = `${activeIndex + 1} / ${slides.length}`;
+            syncTrackHeightToActiveSlide();
+            syncVideoPlayback();
+        };
+
+        const resetToFirstSlide = () => {
+            if (activeIndex === 0 && track.scrollLeft === 0) return;
+            track.scrollTo({ left: 0, behavior: 'auto' });
+            activeIndex = 0;
+            updateActiveDot();
+        };
+
+        track.addEventListener('touchstart', (event) => {
+            if (event.touches.length !== 1) return;
+            touchStartX = event.touches[0].clientX;
+            touchStartIndex = activeIndex;
+        }, { passive: true });
+
+        track.addEventListener('touchend', (event) => {
+            if (touchStartX === null || event.changedTouches.length === 0) return;
+
+            const deltaX = event.changedTouches[0].clientX - touchStartX;
+            touchStartX = null;
+            if (Math.abs(deltaX) < 35) return;
+
+            const direction = deltaX < 0 ? 1 : -1;
+            const targetIndex = Math.max(0, Math.min(slides.length - 1, touchStartIndex + direction));
+            track.scrollTo({
+                left: targetIndex * track.clientWidth,
+                behavior: 'smooth'
+            });
+        }, { passive: true });
+
+        track.addEventListener('scroll', () => {
+            track.dataset.justScrolled = '1';
+            if (clearScrollStateTimer) {
+                clearTimeout(clearScrollStateTimer);
+            }
+            clearScrollStateTimer = window.setTimeout(() => {
+                delete track.dataset.justScrolled;
+                clearScrollStateTimer = null;
+            }, 140);
+
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                updateActiveDot();
+                ticking = false;
+            });
+        }, { passive: true });
+
+        const syncVideoPlaybackOnViewportChange = () => {
+            if (viewportSyncTicking) return;
+            viewportSyncTicking = true;
+            window.requestAnimationFrame(() => {
+                syncVideoPlayback();
+                viewportSyncTicking = false;
+            });
+        };
+
+        const carouselViewportObserver = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    carouselInView = entry.isIntersecting;
+                    if (!entry.isIntersecting) {
+                        resetToFirstSlide();
+                        syncVideoPlayback();
+                        return;
+                    }
+                    syncVideoPlayback();
+                });
+            },
+            {
+                threshold: 0.15
+            }
+        );
+
+        carouselViewportObserver.observe(carousel);
+
+        window.addEventListener('scroll', syncVideoPlaybackOnViewportChange, { passive: true });
+        window.addEventListener('resize', () => {
+            updateActiveDot();
+            syncVideoPlaybackOnViewportChange();
+        });
+        updateActiveDot();
+    });
+
+// ===== 行程照片放大 Lightbox（共用） =====
+    const dayPhotos = document.querySelectorAll('.js-lightbox-photo');
+
+    if (!FEATURES.lightbox) {
+        dayPhotos.forEach(photoCard => {
+            photoCard.style.cursor = 'default';
+        });
+    } else {
+    // 建立 lightbox
+    const lightbox = document.createElement('div');
+    lightbox.className = 'lightbox';
+    lightbox.innerHTML = `
+        <div class="lightbox-stage">
+            <img src="" alt="Large Photo">
+        </div>
+        <div class="lightbox-indicator"></div>
+    `;
+    const lightboxStage = lightbox.querySelector('.lightbox-stage');
+    const lightboxImage = lightbox.querySelector('.lightbox-stage img');
+    const lightboxIndicator = lightbox.querySelector('.lightbox-indicator');
+    document.body.appendChild(lightbox);
+
+    let lightboxSlides = [];
+    let lightboxIndex = 0;
+    let lightboxTouchStartX = null;
+
+    function renderLightboxSlide() {
+        if (lightboxSlides.length === 0) return;
+        const active = lightboxSlides[lightboxIndex];
+        lightboxImage.src = active.src;
+        lightboxImage.alt = active.alt || 'Large Photo';
+        lightboxIndicator.textContent = `${lightboxIndex + 1} / ${lightboxSlides.length}`;
+
+        const multi = lightboxSlides.length > 1;
+        lightboxIndicator.style.display = multi ? 'inline-flex' : 'none';
+    }
+
+    function openLightbox(slides, startIndex) {
+        if (!slides || slides.length === 0) return;
+        lightboxSlides = slides;
+        lightboxIndex = Math.max(0, Math.min(startIndex, slides.length - 1));
+        renderLightboxSlide();
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('active');
+        lightboxSlides = [];
+        lightboxTouchStartX = null;
+        document.body.style.overflow = '';
+    }
+
+    function moveLightbox(step) {
+        if (lightboxSlides.length <= 1) return;
+        const total = lightboxSlides.length;
+        lightboxIndex = (lightboxIndex + step + total) % total;
+        renderLightboxSlide();
+    }
+
+    function buildSlidesFromPhotoCard(photoCard) {
+        const track = photoCard.closest('.photo-carousel-track');
+        const cards = track
+            ? Array.from(track.querySelectorAll('.js-lightbox-photo'))
+            : [photoCard];
+
+        const slides = [];
+        let startIndex = 0;
+        cards.forEach(card => {
+            const img = card.querySelector('img');
+            if (!img || !img.src) return;
+            if (card === photoCard) startIndex = slides.length;
+            slides.push({
+                src: img.src,
+                alt: img.alt || 'Large Photo'
+            });
+        });
+        return { slides, startIndex };
+    }
+
+    dayPhotos.forEach(photoCard => {
+        photoCard.addEventListener('click', () => {
+            const carouselTrack = photoCard.closest('.photo-carousel-track');
+            if (carouselTrack && carouselTrack.dataset.justScrolled === '1') return;
+
+            const { slides, startIndex } = buildSlidesFromPhotoCard(photoCard);
+            openLightbox(slides, startIndex);
+        });
+    });
+
+    lightboxStage.addEventListener('touchstart', (event) => {
+        if (event.touches.length !== 1) return;
+        lightboxTouchStartX = event.touches[0].clientX;
+    }, { passive: true });
+
+    lightboxStage.addEventListener('touchend', (event) => {
+        if (lightboxTouchStartX === null) return;
+        const endX = event.changedTouches[0].clientX;
+        const deltaX = endX - lightboxTouchStartX;
+        lightboxTouchStartX = null;
+        if (Math.abs(deltaX) < 40) return;
+        if (deltaX < 0) {
+            moveLightbox(1);
+        } else {
+            moveLightbox(-1);
+        }
+    }, { passive: true });
+
+    document.addEventListener('keydown', (event) => {
+        if (!lightbox.classList.contains('active')) return;
+        if (event.key === 'Escape') {
+            closeLightbox();
+        } else if (event.key === 'ArrowRight') {
+            moveLightbox(1);
+        } else if (event.key === 'ArrowLeft') {
+            moveLightbox(-1);
+        }
+    });
+
+    lightbox.addEventListener('click', (event) => {
+        if (event.target !== lightbox && event.target !== lightboxStage && event.target !== lightboxImage) return;
+        closeLightbox();
+    });
+    }
+
+// ===== Event Card 自動凸顯（進入視窗放大，離開還原） =====
+if (FEATURES.cardHighlight) {
+const eventCards = Array.from(document.querySelectorAll('.event-card'));
+let activeEventCard = null;
+let cardHighlightTicking = false;
+
+function getEventCardDistance(card, anchorY, viewportH) {
+    const rect = card.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > viewportH) return Number.POSITIVE_INFINITY;
+    if (rect.top <= anchorY && rect.bottom >= anchorY) return 0;
+    return Math.min(Math.abs(rect.top - anchorY), Math.abs(rect.bottom - anchorY));
+}
+
+function updateActiveEventCard() {
+    if (eventCards.length === 0) return;
+
+    const viewportH = window.innerHeight || document.documentElement.clientHeight;
+    const anchorY = Math.min(Math.max(viewportH * 0.42, 180), 420);
+    const switchHysteresis = 16;
+
+    let bestCard = null;
+    let bestDistance = Number.POSITIVE_INFINITY;
+
+    eventCards.forEach((card) => {
+        const distance = getEventCardDistance(card, anchorY, viewportH);
+        if (distance < bestDistance) {
+            bestDistance = distance;
+            bestCard = card;
+        }
+    });
+
+    if (!bestCard || !Number.isFinite(bestDistance)) {
+        if (activeEventCard) {
+            activeEventCard.classList.remove('in-view');
+            activeEventCard = null;
+        }
+        return;
+    }
+
+    // 切換需要超過距離差，避免臨界點反覆抖動
+    if (activeEventCard && activeEventCard !== bestCard) {
+        const activeDistance = getEventCardDistance(activeEventCard, anchorY, viewportH);
+        if (Number.isFinite(activeDistance) && bestDistance + switchHysteresis >= activeDistance) {
+            bestCard = activeEventCard;
+        }
+    }
+
+    if (activeEventCard === bestCard) return;
+
+    if (activeEventCard) {
+        activeEventCard.classList.remove('in-view');
+    }
+    activeEventCard = bestCard;
+    activeEventCard.classList.add('in-view');
+}
+
+function scheduleActiveEventCardUpdate() {
+    if (cardHighlightTicking) return;
+    cardHighlightTicking = true;
+    window.requestAnimationFrame(() => {
+        updateActiveEventCard();
+        cardHighlightTicking = false;
+    });
+}
+
+window.addEventListener('scroll', scheduleActiveEventCardUpdate, { passive: true });
+window.addEventListener('resize', scheduleActiveEventCardUpdate);
+window.addEventListener('load', scheduleActiveEventCardUpdate);
+scheduleActiveEventCardUpdate();
+} else {
+    document.querySelectorAll('.event-card.in-view').forEach((card) => {
+        card.classList.remove('in-view');
+    });
+}
+
+/* ===== 日期 Day Header 亮燈 / 暗燈 ===== */
+const daySections = Array.from(document.querySelectorAll('.day-section'));
+const dayHeaders = daySections
+    .map(section => section.querySelector('.day-header'))
+    .filter(Boolean);
+
+function updateActiveDayHeader() {
+    if (daySections.length === 0 || dayHeaders.length === 0) return;
+
+    // 用固定定位線判斷「當前日」，避免內容高度變動造成交集判斷飄移
+    const viewportH = window.innerHeight || document.documentElement.clientHeight;
+    const anchorY = Math.min(Math.max(viewportH * 0.24, 90), 220);
+    let activeIndex = 0;
+
+    daySections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= anchorY) activeIndex = index;
+    });
+
+    dayHeaders.forEach((header, index) => {
+        header.classList.toggle('in-view', index === activeIndex);
+    });
+}
+
+window.addEventListener('scroll', updateActiveDayHeader, { passive: true });
+window.addEventListener('resize', updateActiveDayHeader);
+window.addEventListener('load', updateActiveDayHeader);
+updateActiveDayHeader();
+
+// ===== Tab switcher (旅行 / 花費) =====
+    const tabItineraryBtn = document.getElementById('tabItinerary');
+    const tabCostBtn = document.getElementById('tabCost');
+    const tabContentItinerary = document.getElementById('tabContentItinerary');
+    const tabContentCost = document.getElementById('tabContentCost');
+
+    function setActiveTab(tab) {
+        if (tab === 'cost' && !FEATURES.costTab) {
+            tab = 'itinerary';
+        }
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (tab === 'itinerary') {
+            tabItineraryBtn.classList.add('hero-btn--active');
+            tabCostBtn.classList.remove('hero-btn--active');
+            tabContentItinerary.classList.add('active');
+            tabContentCost.classList.remove('active');
+            // 顯示底部導航
+            bottomNav.style.display = FEATURES.bottomNav ? 'flex' : 'none';
+        } else {
+            tabItineraryBtn.classList.remove('hero-btn--active');
+            tabCostBtn.classList.add('hero-btn--active');
+            tabContentItinerary.classList.remove('active');
+            tabContentCost.classList.add('active');
+            computeCostTotal();
+            // 隱藏底部導航
+            bottomNav.style.display = 'none';
+        }
+    }
+
+    tabItineraryBtn.addEventListener('click', () => setActiveTab('itinerary'));
+    tabCostBtn.addEventListener('click', () => setActiveTab('cost'));
+
+    function computeCostTotal() {
+        const rows = document.querySelectorAll('#costTable tbody tr');
+        let total = 0;
+        rows.forEach(row => {
+            const cell = row.querySelector('td:nth-child(4)');
+            if (!cell) return;
+            const value = parseFloat(cell.textContent.replace(/,/g, '')) || 0;
+            total += value;
+        });
+        document.getElementById('costTotal').textContent = total.toLocaleString();
+    }
+
+    // 初始計算總計
+    computeCostTotal();
+
+(function () {
+  var NAV_MAP = window.__TRIP_NAV_MAP__ || {};
+  var FEATURES = window.__TRIP_FEATURES__ || {};
+
+  if (typeof getActiveNavId === 'function') {
+    getActiveNavId = function (currentSectionId) {
+      if (currentSectionId && NAV_MAP[currentSectionId]) {
+        return NAV_MAP[currentSectionId];
+      }
+      var first = document.querySelector('.bottom-nav a');
+      return first ? first.getAttribute('href') : '#';
+    };
+  }
+
+  if (!FEATURES.bottomNav) {
+    var bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav) bottomNav.style.display = 'none';
+  }
+
+  if (!FEATURES.costTab) {
+    var tabCost = document.getElementById('tabCost');
+    var tabCostContent = document.getElementById('tabContentCost');
+    if (tabCost) tabCost.style.display = 'none';
+    if (tabCostContent) tabCostContent.classList.remove('active');
+  }
+})();
+
+      (function () {
+        if (!window.__TRIP_BUILDER_PREVIEW__) return;
+        try {
+          if (document.documentElement) {
+            document.documentElement.style.scrollBehavior = 'auto';
+          }
+          if (document.body) {
+            document.body.style.scrollBehavior = 'auto';
+          }
+        } catch (_) {}
+      })();
+      (function () {
+        function parseCostNumberText(text) {
+          const value = Number(String(text || '').replace(/,/g, '').trim());
+          return Number.isFinite(value) ? value : 0;
+        }
+
+        function roundCost(value) {
+          const num = Number(value || 0);
+          if (!Number.isFinite(num)) return 0;
+          return Math.round(num * 100) / 100;
+        }
+
+        function formatCostText(value) {
+          const num = roundCost(value);
+          return Number.isFinite(num) ? num.toLocaleString(undefined, { maximumFractionDigits: 2 }) : '0';
+        }
+
+        function buildSettlementPlan(balanceByMember, members, labels) {
+          var order = Array.isArray(members) && members.length > 0
+            ? members.slice()
+            : Object.keys(balanceByMember || {});
+          var creditors = [];
+          var debtors = [];
+          order.forEach(function (member) {
+            var diff = roundCost(balanceByMember[member] || 0);
+            if (diff > 0.009) creditors.push({ member: member, amount: diff });
+            else if (diff < -0.009) debtors.push({ member: member, amount: Math.abs(diff) });
+          });
+          creditors.sort(function (a, b) { return b.amount - a.amount; });
+          debtors.sort(function (a, b) { return b.amount - a.amount; });
+
+          var moves = [];
+          var c = 0;
+          var d = 0;
+          while (c < creditors.length && d < debtors.length) {
+            var creditor = creditors[c];
+            var debtor = debtors[d];
+            var amount = roundCost(Math.min(creditor.amount, debtor.amount));
+            if (amount > 0.009) {
+              var fromLabel = (labels && labels[debtor.member]) || String(debtor.member || '').toUpperCase();
+              var toLabel = (labels && labels[creditor.member]) || String(creditor.member || '').toUpperCase();
+              moves.push(fromLabel + ' → ' + toLabel + ' ' + formatCostText(amount));
+            }
+            creditor.amount = roundCost(creditor.amount - amount);
+            debtor.amount = roundCost(debtor.amount - amount);
+            if (creditor.amount <= 0.009) c += 1;
+            if (debtor.amount <= 0.009) d += 1;
+          }
+          return moves;
+        }
+
+        function refreshCostPanels() {
+          let grandTotal = 0;
+          document.querySelectorAll('.cost-panel').forEach(function (panel) {
+            var table = panel.querySelector('table.cost-table');
+            if (!table) return;
+            var headers = Array.prototype.slice.call(table.querySelectorAll('thead th'));
+            var bodyRows = Array.prototype.slice.call(table.querySelectorAll('tbody tr'));
+            var memberColumnIndices = [];
+            headers.forEach(function (th, index) {
+              if (th.classList.contains('cost-cell-member')) {
+                memberColumnIndices.push(index);
+              }
+            });
+            if (memberColumnIndices.length === 0) {
+              if (headers.length >= 5) {
+                memberColumnIndices = [1, 2, 3];
+              }
+            }
+            if (memberColumnIndices.length === 0) return;
+
+            var memberTotalNodes = Array.prototype.slice.call(panel.querySelectorAll('[data-cost-total-member]'));
+            var memberIds = memberTotalNodes.map(function (node) {
+              return String(node.getAttribute('data-cost-total-member') || '').trim();
+            }).filter(Boolean);
+            if (memberIds.length === 0) {
+              memberIds = memberColumnIndices.map(function (_, index) {
+                return 'member-' + (index + 1);
+              });
+            }
+            if (memberIds.length < memberColumnIndices.length) {
+              for (var i = memberIds.length; i < memberColumnIndices.length; i += 1) {
+                memberIds.push('member-' + (i + 1));
+              }
+            }
+
+            var labels = {};
+            memberIds.forEach(function (memberId, index) {
+              var label = '';
+              var totalNode = memberTotalNodes[index];
+              if (totalNode) {
+                var strong = totalNode.closest('.pill') ? totalNode.closest('.pill').querySelector('strong') : null;
+                if (strong) {
+                  label = String(strong.textContent || '').replace(/s*淨額s*$/, '').trim();
+                }
+              }
+              if (!label) {
+                var colIndex = memberColumnIndices[index];
+                if (headers[colIndex]) {
+                  label = String(headers[colIndex].textContent || '').trim();
+                }
+              }
+              labels[memberId] = label || String(memberId || '').toUpperCase();
+            });
+
+            var memberTotals = {};
+            memberIds.forEach(function (memberId) {
+              memberTotals[memberId] = 0;
+            });
+            var grossExpense = 0;
+            var grossRefund = 0;
+            bodyRows.forEach(function (row) {
+              var cells = row.querySelectorAll('td');
+              if (!cells || cells.length === 0) return;
+              var label = (cells[0].textContent || '').trim();
+              if (!label || label === '小計' || label === '總計') return;
+              var memberValues = memberColumnIndices.map(function (colIndex) {
+                return cells[colIndex] ? cells[colIndex].textContent : '';
+              });
+
+              memberValues.forEach(function (valueText, index) {
+                var signed = parseCostNumberText(valueText);
+                if (signed >= 0) grossExpense = roundCost(grossExpense + signed);
+                else grossRefund = roundCost(grossRefund + Math.abs(signed));
+                var memberId = memberIds[index];
+                memberTotals[memberId] = roundCost((memberTotals[memberId] || 0) + signed);
+              });
+            });
+
+            var all = roundCost(Object.keys(memberTotals).reduce(function (sum, memberId) {
+              return sum + (memberTotals[memberId] || 0);
+            }, 0));
+            var average = roundCost(all / Math.max(1, memberIds.length));
+            grandTotal = roundCost(grandTotal + all);
+            var balance = {};
+            memberIds.forEach(function (memberId) {
+              balance[memberId] = roundCost((memberTotals[memberId] || 0) - average);
+            });
+            var settleLines = buildSettlementPlan(balance, memberIds, labels);
+
+            var setText = function (key, value) {
+              var node = panel.querySelector('[data-cost-total="' + key + '"]');
+              if (node) node.textContent = formatCostText(value);
+            };
+            memberIds.forEach(function (memberId) {
+              var node = panel.querySelector('[data-cost-total-member="' + memberId + '"]')
+                || panel.querySelector('[data-cost-total="' + memberId + '"]');
+              if (node) node.textContent = formatCostText(memberTotals[memberId] || 0);
+            });
+            setText('all', all);
+            setText('avg', average);
+            setText('expense', grossExpense);
+            setText('refund', grossRefund);
+
+            var settleNode = panel.querySelector('[data-cost-settlement]');
+            if (settleNode) {
+              if (settleLines.length === 0) {
+                settleNode.innerHTML = '<span class="cost-settle-empty">已平衡，無需額外轉帳。</span>';
+              } else {
+                settleNode.innerHTML = settleLines.map(function (line) {
+                  return '<span class="cost-settle-item">' + line + '</span>';
+                }).join('');
+              }
+            }
+          });
+
+          var totalNode = document.getElementById('costTotal');
+          if (totalNode) totalNode.textContent = formatCostText(grandTotal);
+        }
+
+        function safeRefreshCostPanels() {
+          try {
+            refreshCostPanels();
+          } catch (err) {
+            console.warn('[trip-builder] cost panel refresh failed:', err);
+          }
+        }
+
+        if (typeof computeCostTotal === 'function') {
+          computeCostTotal = safeRefreshCostPanels;
+        }
+        window.computeCostTotal = safeRefreshCostPanels;
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', safeRefreshCostPanels, { once: true });
+        } else {
+          safeRefreshCostPanels();
+        }
+        window.addEventListener('load', safeRefreshCostPanels);
+      })();
+      (function () {
+        var bottomNav = document.querySelector('.bottom-nav');
+        if (!bottomNav) return;
+        bottomNav.addEventListener('click', function (event) {
+          var target = event.target && event.target.closest ? event.target.closest('a') : null;
+          if (!target && event.target && event.target.nodeType === 3 && event.target.parentElement) {
+            target = event.target.parentElement.closest('a');
+          }
+          if (!target) return;
+          if (bottomNav.classList.contains('scrolled') && target.classList.contains('active')) {
+            event.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
+</body>
+</html>
